@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+@import url("https://unpkg.com/bootstrap@5.3.0/dist/css/bootstrap.min.css");
+
+input.ng-pristine {
+  border-left: 5px solid yellow;
+}
+input.ng-touched.ng-invalid {
+  border-left: 5px solid red;
+}
+input.ng-touched.ng-valid {
+  border-left: 5px solid green;
+}
