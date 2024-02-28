@@ -1,76 +1,35 @@
-<span>{{ title }} app is running!</span>
 <hr />
 <div class="container">
-  <form #userDetails="ngForm" (ngSubmit)="onSubmit()" novalidate>
-    <div ngModelGroup="fullName">
-      <div class="form-group">
+  <form [formGroup]="userDetails" (ngSubmit)="onSubmit()">
+    <div formGroupName="fgFullName" class="mb-3">
+      <div class="mb-3">
         <label for="fName" class="form-label">First name:</label>
         <input
           type="text"
           name="fName"
-          [(ngModel)]="user.firstName"
-          #fName="ngModel"
-          required
           class="form-control"
+          formControlName="firstName"
         >
-        <div [hidden]="fName.valid || fName.pristine" class="alert alert-danger">Please tell us your name</div>
-        <br />
+        <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)">
+          <div *ngIf="firstName.errors?.['required']">
+            Name is required.
+          </div>
+          <div *ngIf="firstName.errors?.['minlength']">
+            Name is too short.
+          </div>
+          <div *ngIf="firstName.errors?.['alphaCheck']">
+            Name cannot have numeric values or special characters.
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <label for="fName" class="form-label">Last name:</label>
+      <div class="mb-3">
+        <label for="lName" class="form-label">Last name:</label>
         <input
           type="text"
           name="lName"
-          [(ngModel)]="user.lastName"
-          #lName="ngModel"
-          required
           class="form-control"
-          (blur)="suggestEmail($event)"
+          formControlName="lastName"
         >
-        <div [hidden]="lName.valid || lName.pristine" class="alert alert-danger">Please tell us your name</div>
-        <br />
-      </div>
-    </div>
-    <div class="form-select mb-5">
-      <label class="form-label" for="department">Department:</label>
-      <select name="department" [(ngModel)]="user.department" class="form-control">
-        <option value="undefined">--Choose an Option--</option>
-        <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
-      </select>
-    </div>
-
-    <div *ngIf="(userMail.touched && !userMail.valid)" class="alert alert-danger">
-      <span *ngIf="userMail.errors?.['required']">Email is a required field!</span>
-      <span *ngIf="userMail.errors?.['pattern']">Please provide a valid email address!</span>
-    </div>
-    <div class="form-group mb-3">
-      <label for="email" class="form-label">Email:</label>
-      <input
-        type="email"
-        name="userMail"
-        [ngModel]="user.email"
-        #userMail="ngModel"
-        required
-        email
-        class="form-control"
-      >
-      <!--pattern="[a-z0-9._%+]" ... -->
-      <div [hidden]="userMail.valid || userMail.pristine" class="alert alert-danger">Please tell us your email</div>
-      <br />
-    </div>
-    <div class="form-group mb-3">
-      <label class="form-label" for="prizes">Prize preference:</label>
-      <div class="radio form-check form-check-inline" *ngFor="let prize of prizes">
-        <label>
-          <input
-            type="radio"
-            name="prizePreference"
-            [value]="prize"
-            [(ngModel)]="selectedPrize"
-            required
-          />
-          {{ prize }}
-        </label>
       </div>
     </div>
     <input
@@ -85,7 +44,6 @@
       (click)="userDetails.reset()"
       class="btn btn-warning"
     >
-    <br />
   </form>
 </div>
 <router-outlet />

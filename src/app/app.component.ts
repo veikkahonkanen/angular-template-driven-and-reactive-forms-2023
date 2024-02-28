@@ -1,7 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { FormsModule, NgForm } from "@angular/forms";
-import { User } from "./user";
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, NgForm, ReactiveFormsModule, Validators } from "@angular/forms";
+// import { User } from "./user";
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,34 +10,62 @@ import { CommonModule } from '@angular/common';
   imports: [
     RouterOutlet,
     FormsModule,
-    CommonModule
+    CommonModule,
+    ReactiveFormsModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
-  @ViewChild("userDetails") userDetails!: NgForm;
-  title = 'skills';
-  user: User = {};
-  departments: string[] = [ "sales", "accounting", "customerSupport", "contentCreation" ];
-  prizes: string[] = [ "cash", "voucher", "lunch" ];
-  selectedPrize: string = "";
+export class AppComponent implements OnInit {
+  userDetails!: FormGroup;
+  constructor(private fb: FormBuilder) { }
 
-  constructor() {
-    this.user = new User();
-    this.selectedPrize = this.prizes[0];
+  ngOnInit(): void {
+    this.userDetails = new FormGroup({
+      fgFullName: new FormGroup({
+        firstName: new FormControl(null, [ Validators.required, Validators.minLength(2), this.alphaCheck ]),
+        lastName: new FormControl(null, [ Validators.required, Validators.minLength(2), this.alphaCheck ]),
+      }),
+      email: new FormControl(null, Validators.minLength(2)),
+      department: new FormControl(),
+      prizes: new FormArray([
+        new FormControl(null),
+        new FormControl(null),
+        new FormControl(null),
+      ])
+    });
   }
 
-  onSubmit(/* userDetails: User NgForm*/) {
-    // console.log("Form submitted! ", userDetails.value.fName);
-    // console.log(`First name: ${userDetails.controls["fName"].value} Last name: ${userDetails.controls["lName"].value}`);
-    // console.log(userDetails);
-    console.log(this.userDetails.value);
+  onSubmit() {
+    console.log(this.userDetails);
   }
 
-  suggestEmail(event: any) {
-    this.userDetails.form.patchValue({
-      email: `${this.user.firstName}.${this.user.lastName}@skillsoft.com` 
-    })
+  alphaCheck(control: AbstractControl): { [ key: string ]: boolean } | null {
+    const regExp: RegExp = /^[A-Za-z]+$/;
+    const cValue = control.value;
+    if (!regExp.test(cValue)) {
+      return { alphaCheck: true };
+    }
+    return null;
+  }
+
+  get firstName() {
+    return this.userDetails?.get("fgFullName")?.get("firstName")!;
+  }
+
+  get lastName() {
+    return this.userDetails?.get("fgFullName")?.get("lastName")!;
+  }
+
+  get email() {
+    return this.userDetails.get("email")!;
+  }
+
+  get department() {
+    return this.userDetails.get("department")!;
+  }
+
+  get allPrizes() {
+    return this.userDetails.get("prizes")! as FormArray;
   }
 }
