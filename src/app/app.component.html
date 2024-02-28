@@ -1,7 +1,7 @@
 <hr />
 <div class="container">
-  <form [formGroup]="userDetails" (ngSubmit)="onSubmit()">
-    <div formGroupName="fgFullName" class="mb-3">
+  <form [formGroup]="userDetails" (ngSubmit)="onSubmit(userDetails)">
+    <div formGroupName="fullName" class="mb-3">
       <div class="mb-3">
         <label for="fName" class="form-label">First name:</label>
         <input
@@ -10,16 +10,8 @@
           class="form-control"
           formControlName="firstName"
         >
-        <div *ngIf="firstName.invalid && (firstName.dirty || firstName.touched)">
-          <div *ngIf="firstName.errors?.['required']">
-            Name is required.
-          </div>
-          <div *ngIf="firstName.errors?.['minlength']">
-            Name is too short.
-          </div>
-          <div *ngIf="firstName.errors?.['alphaCheck']">
-            Name cannot have numeric values or special characters.
-          </div>
+        <div *ngIf="userDetails?.get('fullName')?.get('firstName')?.errors?.['required']">
+          First name is required.
         </div>
       </div>
       <div class="mb-3">
@@ -32,16 +24,26 @@
         >
       </div>
     </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email:</label>
+      <input
+        type="email"
+        name="email"
+        class="form-control"
+        formControlName="email"
+      >
+      <div *ngIf="userDetails?.get('email')?.errors?.['restrictEmail'] == false">
+        This email cannot be used.
+      </div>
+    </div>
     <input
       type="submit"
       value="submit"
-      [disabled]="userDetails.invalid"
       class="btn btn-primary"
     >
     <input
       type="reset"
       value="reset"
-      (click)="userDetails.reset()"
       class="btn btn-warning"
     >
   </form>

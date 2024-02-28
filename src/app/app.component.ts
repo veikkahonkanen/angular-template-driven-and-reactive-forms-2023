@@ -1,8 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, FormsModule, NgForm, ReactiveFormsModule, Validators } from "@angular/forms";
-// import { User } from "./user";
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -16,56 +16,32 @@ import { CommonModule } from '@angular/common';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent implements OnInit {
-  userDetails!: FormGroup;
+export class AppComponent {
+  userDetails = this.fb.group({
+    fullName: this.fb.group({
+      firstName: [ "", Validators.required ],
+      lastName: [ "", Validators.required ],
+    }),
+    email: [ "", Validators.required, this.restrictEmail ],
+    department: [ "", Validators.required ]
+  });
+
   constructor(private fb: FormBuilder) { }
 
-  ngOnInit(): void {
-    this.userDetails = new FormGroup({
-      fgFullName: new FormGroup({
-        firstName: new FormControl(null, [ Validators.required, Validators.minLength(2), this.alphaCheck ]),
-        lastName: new FormControl(null, [ Validators.required, Validators.minLength(2), this.alphaCheck ]),
-      }),
-      email: new FormControl(null, Validators.minLength(2)),
-      department: new FormControl(),
-      prizes: new FormArray([
-        new FormControl(null),
-        new FormControl(null),
-        new FormControl(null),
-      ])
+  restrictEmail(control: AbstractControl): Promise<any> | Observable<any> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        if (control.value === "axle@skillsoft.com") {
+          resolve({ restrictEmail: false });
+        } else {
+          null;
+        }
+      }, 1500);
     });
   }
 
-  onSubmit() {
-    console.log(this.userDetails);
+  onSubmit(userDetails: FormGroup) {
+    console.log(this.userDetails.value);
   }
 
-  alphaCheck(control: AbstractControl): { [ key: string ]: boolean } | null {
-    const regExp: RegExp = /^[A-Za-z]+$/;
-    const cValue = control.value;
-    if (!regExp.test(cValue)) {
-      return { alphaCheck: true };
-    }
-    return null;
-  }
-
-  get firstName() {
-    return this.userDetails?.get("fgFullName")?.get("firstName")!;
-  }
-
-  get lastName() {
-    return this.userDetails?.get("fgFullName")?.get("lastName")!;
-  }
-
-  get email() {
-    return this.userDetails.get("email")!;
-  }
-
-  get department() {
-    return this.userDetails.get("department")!;
-  }
-
-  get allPrizes() {
-    return this.userDetails.get("prizes")! as FormArray;
-  }
 }
